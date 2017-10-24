@@ -1,11 +1,13 @@
+
+
 const inspector = require('util');
 const c = require('./const.js');
 const util = require('./utilities.js');
 const gambling = require('./gambling.js');
+const dnb = require('./dnb.js');
 var games = require('./games.js');
 var vote = require('./vote.js');
 var previousMessageID = '';
-
 /**
  * Asks Scrubs if they want to play pubg.
  */
@@ -21,7 +23,7 @@ function askToPlayPUBG() {
  */
 c.BOT.on('message', function (user, userID, channelID, message, evt) {
     //Scrub Daddy will listen for messages that will start with `!`
-    if (message.substring(0, 1) == '!') {
+    if (message.substring(0, 1) == '~') {
 		const args = message.substring(1).match(/\S+/g);
 		const cmd = args[0];
 
@@ -31,6 +33,8 @@ c.BOT.on('message', function (user, userID, channelID, message, evt) {
 		}
 		c.LOG.info('<INFO> ' + util.getTimestamp() + '  ' + cmd + ' called');	
         switch(cmd) {
+			case 'dropScrub':
+				dnb.maybeDischargeScrubBubble();
 			case 'ranks':
 				gambling.armyRanks();
 				break;
@@ -148,7 +152,7 @@ c.BOT.on('message', function (user, userID, channelID, message, evt) {
  */
 c.BOT.on('presence', function(user, userID, status, game, event) { 
 	games.updateTimesheet(user, userID, game);
-	gambling.maybeDischargeScrubBubble();
+	//dnb.maybeDischargeScrubBubble();
 });
 
 /**

@@ -1,4 +1,4 @@
-window.scrubSpace = window.scrubSpace || { };
+
 
 class ScrubSquad
 {
@@ -18,3 +18,5 @@ class ScrubSquad
         return scrubs;
     }
 }
+
+export default ScrubSquad;

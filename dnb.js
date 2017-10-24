@@ -3,7 +3,13 @@
  *Control armies of scubbing bubbles and clean up bathrooms
  *The game sounded cooler in my head
  */
-window.scrubSpace = window.scrubSpace || { };
+
+//import ScrubBubble from './ScrubBubble.js';
+//import ScrubSquad from './ScrubSquad.js';
+
+const util = require('./utilities.js');
+const SB = require('./ScrubBubble');
+require('./ScrubBubble.js');
 
 var ledger = require('./ledger.json');   //keeps track of how big of an army each member has as well as bet amounts
 var dropped = 0;
@@ -12,7 +18,7 @@ exports.maybeDischargeScrubBubble = function()
 {
     var num = util.getRand(1,100);
 	if (num > 10) {
-		return new ScrubBubble();
+		return require('./ScrubBubble.js');
 	}
 }
 
@@ -37,25 +43,25 @@ function addToArmy(userID, amount)
     }
     for(i = 0; i < amount; i++)
     {
-        ledger[userID].army.push(new scrubBubble());
+        ledger[userID].army.push(new ScrubBubble.ScrubBubble());
     }
 }
 
-exports.createSquad(userID)
+exports.createSquad = function(userID)
 {
     ledger[userID].squads.push(new ScrubSquad());
 }
 
 
 //takes userID, number of squad to add scrubs and an array of scrubs to add
-exports.addToSquad(userID, squadNumber, scrubs)
+exports.addToSquad = function(userID, squadNumber, scrubs)
 {
     scrubs.array.forEach(function(scrub) {
         ledger[userID].squads[squadNumber].push(scrub);
     });
 }
 
-exports.getSquads(userID, squadNumber)
+exports.getSquads = function(userID, squadNumber)
 {
     var chat = '';
     var scrubNum = 0;
@@ -65,3 +71,5 @@ exports.getSquads(userID, squadNumber)
     });
     return chat;
 }
+
+//export default dnb;

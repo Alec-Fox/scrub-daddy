@@ -1,4 +1,4 @@
-window.scrubSpace = window.scrubSpace || { };
+//import ScrubSquad from './ScrubSquad.js';
 
 class ScrubBubble
 {
