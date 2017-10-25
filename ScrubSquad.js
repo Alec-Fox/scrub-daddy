@@ -18,5 +18,3 @@ class ScrubSquad
         return scrubs;
     }
 }
-
-export default ScrubSquad;

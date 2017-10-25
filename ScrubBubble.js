@@ -1,29 +1,31 @@
 //import ScrubSquad from './ScrubSquad.js';
-
 class ScrubBubble
 {
     constructor()
     {
-        var _rank = 'private';
-        var _experience = 0;
-        var _leaderExperience = 0;
+        this._rank = 'Private';
+        this. _experience = 0;
+        this. _leaderExperience = 0;
+        this.getRank = this.getRank.bind(this);
+        this.getExperience = this.getExperience.bind(this);
+        this.getLeaderExperience = this.getLeaderExperience.bind(this);
     }
 
     getRank()
     {
-        return _rank;
+        return this._rank;
     }
-
+    
     getExperience()
     {
         return _experience;
     }
-
+    
     getLeaderExperience()
     {
         return _leaderExperience;
     }
-
+    
     toString()
     {
         var string = '';
@@ -32,3 +34,4 @@ class ScrubBubble
         string += "Leader experience: " + _leaderExperience + "\n";
     }
 }
+module.exports = ScrubBubble;

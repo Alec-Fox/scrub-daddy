@@ -4,27 +4,49 @@
  *The game sounded cooler in my head
  */
 
-//import ScrubBubble from './ScrubBubble.js';
+//import { ScrubBubble } from './ScrubBubble.js';
 //import ScrubSquad from './ScrubSquad.js';
 
 const util = require('./utilities.js');
 const SB = require('./ScrubBubble');
-require('./ScrubBubble.js');
+const c = require('./const.js');
 
 var ledger = require('./ledger.json');   //keeps track of how big of an army each member has as well as bet amounts
-var dropped = 0;
+var scrubs = [];
 
 exports.maybeDischargeScrubBubble = function() 
 {
     var num = util.getRand(1,100);
 	if (num > 10) {
-		return require('./ScrubBubble.js');
-	}
+        var scrub = new SB();//require('./ScrubBubble');
+        //scrub.getRank();
+		scrubs.push(scrub);
+    }
+    
+    scrubs.forEach(function(scrub) {
+        c.BOT.sendMessage({
+            to: c.BOT_SPAM_CHANNEL_ID,
+            embed:  {
+                color: 0xffff00,
+                title: scrub.getRank() + ' Scrubbing Bubbles has arrived for duty!',
+            } 
+        });
+    });
+    
+    c.BOT.sendMessage({
+        to: c.BOT_SPAM_CHANNEL_ID,
+        embed:  {
+            color: 0xffff00,
+            image: {
+                url: c.BUBBLE_IMAGES[scrubs.length]
+            }
+        } 
+    });
 }
 
 exports.enlist = function(userID) 
 {
-    if (dropped > 0) 
+    if (dropped.length > 0) 
     {
         addToArmy(userID, dropped);
         c.BOT.sendMessage({
@@ -35,15 +57,15 @@ exports.enlist = function(userID)
     } 
 }
 
-function addToArmy(userID, amount) 
+function addToArmy(userID, scrubs) 
 {
     if (ledger[userID] === undefined) 
     {
         ledger[userID] = { armySize : 0, cleanBet : 0, raceBet : 0};
     }
-    for(i = 0; i < amount; i++)
+    for(i = 0; i < scrubs.length; i++)
     {
-        ledger[userID].army.push(new ScrubBubble.ScrubBubble());
+        ledger[userID].army.push(scrubs[i]);
     }
 }
 
