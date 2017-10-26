@@ -18,27 +18,21 @@ exports.maybeDischargeScrubBubble = function()
 {
     var num = util.getRand(1,100);
 	if (num > 10) {
-        var scrub = new SB();//require('./ScrubBubble');
-        //scrub.getRank();
+        var scrub = new SB();
 		scrubs.push(scrub);
     }
-    
+    var botMessageTitle = '';
     scrubs.forEach(function(scrub) {
-        c.BOT.sendMessage({
-            to: c.BOT_SPAM_CHANNEL_ID,
-            embed:  {
-                color: 0xffff00,
-                title: scrub.getRank() + ' Scrubbing Bubbles has arrived for duty!',
-            } 
-        });
+        botMessageTitle += scrub.getRank() + ' Scrubbing Bubbles has arrived for duty!<br>';
     });
-    
+
     c.BOT.sendMessage({
         to: c.BOT_SPAM_CHANNEL_ID,
         embed:  {
             color: 0xffff00,
             image: {
-                url: c.BUBBLE_IMAGES[scrubs.length]
+                title: botMessageTitle,
+                url: c.BUBBLE_IMAGES[scrubs.length-1]
             }
         } 
     });
@@ -46,14 +40,14 @@ exports.maybeDischargeScrubBubble = function()
 
 exports.enlist = function(userID) 
 {
-    if (dropped.length > 0) 
+    if (scrubs.length > 0) 
     {
-        addToArmy(userID, dropped);
+        addToArmy(userID, scrubs);
         c.BOT.sendMessage({
             to: c.BOT_SPAM_CHANNEL_ID,
-            message: '<@!' + userID + '>  ' + 'Your Scrubbing Bubbles army has grown by ' + dropped + '! You now have an army of ' + ledger[userID].army.length + '.' 
+            message: '<@!' + userID + '>  ' + 'Your Scrubbing Bubbles army has grown by ' + scrubs.length + '! You now have an army of ' + ledger[userID].army.length + '.' 
         });	
-        dropped = 0;
+        scrubs = [];
     } 
 }
 
@@ -61,7 +55,7 @@ function addToArmy(userID, scrubs)
 {
     if (ledger[userID] === undefined) 
     {
-        ledger[userID] = { armySize : 0, cleanBet : 0, raceBet : 0};
+        ledger[userID] = { armySize : 0, cleanBet : 0, raceBet : 0, army: [], squads: []};
     }
     for(i = 0; i < scrubs.length; i++)
     {

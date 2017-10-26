@@ -35,6 +35,7 @@ c.BOT.on('message', function (user, userID, channelID, message, evt) {
         switch(cmd) {
 			case 'dropScrub':
 				dnb.maybeDischargeScrubBubble();
+				break;
 			case 'ranks':
 				gambling.armyRanks();
 				break;
@@ -55,7 +56,7 @@ c.BOT.on('message', function (user, userID, channelID, message, evt) {
 				gambling.dischargeScrubBubble(userID);
 				break;
 			case 'enlist':
-				gambling.enlist(userID);
+				dnb.enlist(userID);
 				break;
 			case 'p':
 				askToPlayPUBG();
