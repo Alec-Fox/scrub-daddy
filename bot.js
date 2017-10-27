@@ -36,6 +36,21 @@ c.BOT.on('message', function (user, userID, channelID, message, evt) {
 			case 'dropScrub':
 				dnb.maybeDischargeScrubBubble();
 				break;
+			case 'createSquad':
+				dnb.createSquad(userID);
+				break;
+			case 'addToSquad':
+				dnb.addToSquad(userID, args);
+				break;
+			case 'getSquads':
+				dnb.getSquads(userID);
+				break;
+			case 'getSquad':
+				dnb.getSquad(userID, args);
+				break;
+			case 'getUnsquaded':
+				dnb.getUnsquaded(userID);
+				break;
 			case 'ranks':
 				gambling.armyRanks();
 				break;
@@ -50,7 +65,16 @@ c.BOT.on('message', function (user, userID, channelID, message, evt) {
 				break;
 			case 'clean':
 				//PRIORITIZE ADDING NICKNAMES VIA GETSCRUBS SO YOU CAN RESPOND TO BETS WITH NICKNAMES
-				gambling.maybeBetClean(userID, args);
+				c.BOT.sendMessage({
+					to: c.BOT_SPAM_CHANNEL_ID,
+					embed:  {
+						color: 0xffff00,
+						title: "This functionality has been disabled! Please wait patiently until the full game is finished!",
+						image: {
+							url: c.BUBBLE_IMAGES[1]
+						}
+					} 
+				});
 				break;
 			case 'discharge':
 				gambling.dischargeScrubBubble(userID);
@@ -136,7 +160,7 @@ c.BOT.on('message', function (user, userID, channelID, message, evt) {
 		 }
 	//DEAR LORD PLZ REFACTOR THIS
 	 } else if (userID === c.SCRUB_DADDY_ID && evt.d.embeds !== undefined && evt.d.embeds[0] !== undefined && 
-		evt.d.embeds[0].title !== undefined && evt.d.embeds[0].title.indexOf('duty') !== -1) {
+		evt.d.embeds[0].title !== undefined && evt.d.embeds[0].title.indexOf('duty') !== -1 && channelID === c.BOT_SPAM_CHANNEL_ID) {
 		c.LOG.info('<INFO> ' + util.getTimestamp() + '  arrive for duty msg found ');
 		//delete previous message if >1 bubbles dropped
 		if (gambling.getDropped() > 1) {
