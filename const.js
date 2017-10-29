@@ -17,7 +17,7 @@ define('BOT', new Discord.Client({
 define('LOG', require('winston'));
 
 define("LOOP_DELAY", 1500);							        //delay between each loop
-define('BOT_SPAM_CHANNEL_ID', '370626436609867786');		//listen's to messages from this channel
+define('BOT_SPAM_CHANNEL_ID', '372911971923656704');		//listen's to messages from this channel
 define('SCRUBS_CHANNEL_ID', '370626384059695107');		    //channel ID of scrubs text channel
 define('SERVER_ID', auth.serverID);				    		//Bed Bath Server ID
 define('DAYS', ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]);
@@ -55,4 +55,3 @@ define('BUBBLE_IMAGES', ['https://i.imgur.com/rddtZR6.png','https://i.imgur.com/
 define('SCRUB_DADDY_ID', '370688149971795982');
 
 define('SCRUB_ID_TO_NICK', util.getScrubIDToNick());
-
