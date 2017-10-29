@@ -29,7 +29,7 @@ exports.maybeDischargeScrubBubble = function()
 
 exports.enlist = function(userID) 
 {
-    initUser(userID);
+    util.initUser(userID);
     if (scrubs.length > 0) 
     {
         addToArmy(userID, scrubs);
@@ -41,8 +41,8 @@ exports.enlist = function(userID)
 
 function addToArmy(userID, scrubs) 
 {
-    initUser(userID);
-    for(i = 0; i < scrubs.length; i++)
+    util.initUser(userID);
+    for(let i = 0; i < scrubs.length; i++)
     {
         ledger[userID].army.push(scrubs[i]);
     }
@@ -50,18 +50,18 @@ function addToArmy(userID, scrubs)
 
 exports.createSquad = function(userID)
 {
-    initUser(userID);
+    util.initUser(userID);
 
     ledger[userID].squads.push(new ScrubSquad());
 
-    var message = '<@!' + userID + '>  ' + 'You have just created squad ' + (ledger[userID].squads.length-1) + '! Make sure to assign a leader and add Scrubbing Bubbles to it!';
+    var message = '<@!' + userID + '>  ' + 'You have just created squad ' + (ledger[userID].squads.length) + '! Make sure to assign a leader and add Scrubbing Bubbles to it!';
     util.sendEmbedMessage(null, message);
 }
 
 exports.deleteSquad = function(userID, args)
 {
-    initUser(userID);
-    var squadNumber = Number(args[1]);
+    util.initUser(userID);
+    var squadNumber = Number(args[1])-1;
     
     if(isInvalidArgumentsSendMessage(userID, squadNumber)) { return; }
     if(squadCheck(userID, squadNumber)) { return; }
@@ -70,16 +70,37 @@ exports.deleteSquad = function(userID, args)
     ledger[userID].army.push.apply(ledger[userID].army, scrubs);
     ledger[userID].squads.splice(squadNumber, 1);
 
-    var message = '<@!' + userID + '>  ' + 'Squad ' + squadNumber + ' has been removed and scrubs have been added to your unsquaded pool!';
+    var message = '<@!' + userID + '>  ' + 'Squad ' + (squadNumber+1) + ' has been removed and scrubs have been added to your unsquaded pool!';
+    util.sendEmbedMessage(null, message);
+}
+
+exports.removeFromSquad = function(userID, args)
+{
+    util.initUser(userID);
+
+    var squadNumber = Number(args[1])-1;
+    var scrubNumber = Number(args[2])-1;
+
+    if(isInvalidArgumentsSendMessage(userID, squadNumber, scrubNumber)) { return; }
+    if(squadCheck(userID, squadNumber)) { return; }
+    if(scrubNumber >= ledger[userID].squads[squadNumber].length)
+    {
+        util.sendEmbedMessage(null, '<@!' + userID + '> That scrub is out of index!');
+    }
+    
+    var scrub = ledger[userID].squads[squadNumber].removeScrub(scrubNumber);
+    ledger[userID].army.push(scrub);
+
+    var message = '<@!' + userID + '>  ' + 'The scrub has been removed and has been added to your unsquaded pool!';
     util.sendEmbedMessage(null, message);
 }
 
 //takes userID, number of squad to add scrubs and an array of scrubs to add
 exports.addToSquad = function(userID, args)
 {
-    initUser(userID);
-    var squadNumber = Number(args[1]);
-    var scrubNumber = Number(args[2]);
+    util.initUser(userID);
+    var squadNumber = Number(args[1])-1;
+    var scrubNumber = Number(args[2])-1;
     if(isInvalidArgumentsSendMessage(userID, squadNumber, scrubNumber)) { return; }
 
     if(scrubCheck(userID, scrubNumber)) { return; }
@@ -88,67 +109,59 @@ exports.addToSquad = function(userID, args)
     ledger[userID].squads[squadNumber].addScrub(ledger[userID].army[scrubNumber]);
     ledger[userID].army.splice(scrubNumber, 1);
 
-    var message = '<@!' + userID + '>  ' + 'Added a scrub to squad ' + squadNumber + '!';
+    var message = '<@!' + userID + '>  ' + 'Added a scrub to squad ' + (squadNumber+1) + '!';
     util.sendEmbedMessage(null, message);
 }
 
 exports.getSquads = function(userID)
 {
-    initUser(userID);
+    util.initUser(userID);
 
     var message = '<@!' + userID + '>  Squad count: ' + ledger[userID].squads.length + '!';
     util.sendEmbedMessage(null, message);
 
     var botMessageDescription = '<@!' + userID + '>\n';
-    for(i = 0; i < ledger[userID].squads.length; i++)
+    for(let i = 0; i < ledger[userID].squads.length; i++)
     {
         botMessageDescription = '';
         var squad = ledger[userID].squads[i];
-        for(j = 0; j < squad.length; j++)
+        for(let j = 0; j < squad.length; j++)
         {
-            botMessageDescription += j + '.\t' + squad.getScrub(j).getRank() + ' Scrubbing Bubbles\n';
+            botMessageDescription += (j+1) + '.\t' + squad.getScrub(j).getRank() + ' Scrubbing Bubbles\n';
         }
 
-        util.sendEmbedMessage('Squad ' + i, botMessageDescription);
+        util.sendEmbedMessage('Squad ' + (i+1), botMessageDescription);
     }
 }
 
 exports.getSquad = function(userID, args)
 {
-    initUser(userID);
-    var squadNumber = Number(args[1]);
+    util.initUser(userID);
+    var squadNumber = Number(args[1])-1;
 
-    if(isInvalidArgumentsSendMessage(userID, squadNumber, scrubNumber)) { return; }
+    if(isInvalidArgumentsSendMessage(userID, squadNumber)) { return; }
     if(squadCheck(userID, squadNumber)) { return; }
 
     var botMessageDescription = '<@!' + userID + '>\n';
-    for(i = 0; i < ledger[userID].squads[squadNumber].length; i++)
+    for(let i = 0; i < ledger[userID].squads[squadNumber].length; i++)
     {
-        botMessageDescription += i + '. ' + ledger[userID].squads[squadNumber].getScrub(i).getRank() + ' Scrubbing Bubbles\n';
+        botMessageDescription += (i+1) + '. ' + ledger[userID].squads[squadNumber].getScrub(i).getRank() + ' Scrubbing Bubbles\n';
     }
 
-    util.sendEmbedMessage('Squad ' + squadNumber + '\'s scrubs:', botMessageDescription);
+    util.sendEmbedMessage('Squad ' + (squadNumber+1) + '\'s scrubs:', botMessageDescription);
 }
 
 exports.getUnsquaded = function(userID)
 {    
-    initUser(userID);
+    util.initUser(userID);
     
     var botMessageDescription = '<@!' + userID + '>\n';
     for(i = 0; i < ledger[userID].army.length; i++)
     {
-        botMessageDescription += i + '.\t'+ledger[userID].army[i].getRank() + ' Scrubbing Bubbles\n';
+        botMessageDescription += (i+1) + '.\t'+ledger[userID].army[i].getRank() + ' Scrubbing Bubbles\n';
     }
 
     util.sendEmbedMessage('Unsquaded Scrubs', botMessageDescription);
-}
-
-function initUser(userID)
-{
-    if (ledger[userID] === undefined) 
-    {
-        ledger[userID] = { armySize : 0, cleanBet : 0, raceBet : 0, army: [], squads: []};
-    }
 }
 
 function isInvalidArgumentsSendMessage(userID, ...args)
@@ -161,7 +174,7 @@ function isInvalidArgumentsSendMessage(userID, ...args)
     return false;
 }
 
-function isInvalidArguments(...args) 
+function isInvalidArguments(args) 
 {
     for (let i=0; i < args.length; i++)
     {
