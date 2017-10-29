@@ -75,6 +75,29 @@ exports.createSquad = function(userID)
     });	
 }
 
+exports.deleteSquad = function(userID, args)
+{
+    initUser(userID);
+    var squadNumber = args[1];
+    if(squadNumber == undefined)
+    {
+        c.BOT.sendMessage({
+            to: c.BOT_SPAM_CHANNEL_ID,
+            message: '<@!' + userID + '>  Enter a squad number!' 
+        });	
+    }
+    if(squadCheck(userID, squadNumber)) { return; }
+    
+    scrubs = ledger[userID].squads[squadNumber].getScrubs();
+    ledger[userID].army.push.apply(ledger[userID].army, scrubs);
+    ledger[userID].squads.splice(squadNumber, 1);
+
+    c.BOT.sendMessage({
+        to: c.BOT_SPAM_CHANNEL_ID,
+        message: '<@!' + userID + '>  ' + 'Squad ' + squadNumber + ' has been removed and scrubs have been added to your unsquaded pool!' 
+    });	
+}
+
 
 //takes userID, number of squad to add scrubs and an array of scrubs to add
 exports.addToSquad = function(userID, args)
@@ -105,7 +128,7 @@ exports.getSquads = function(userID)
 
     c.BOT.sendMessage({
         to: c.BOT_SPAM_CHANNEL_ID,
-        message: '<@!' + userID + '>  Your ' + ledger[userID].squads.length + ' squads!' 
+        message: '<@!' + userID + '>  Squad count: ' + ledger[userID].squads.length + '!' 
     });	
 
     var botMessageDescription = '<@!' + userID + '>\n';

@@ -51,6 +51,15 @@ c.BOT.on('message', function (user, userID, channelID, message, evt) {
 			case 'getUnsquaded':
 				dnb.getUnsquaded(userID);
 				break;
+			case 'deleteSquad':
+				dnb.deleteSquad(userID, args);
+				break;
+			case 'removeFromSquad':
+				dnb.removeFromSquad(userID, args);
+				break;
+			case 'dismissScrub':
+				dnb.dismissScrub(userID, args);
+				break;
 			case 'ranks':
 				gambling.armyRanks();
 				break;

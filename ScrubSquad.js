@@ -5,6 +5,7 @@ class ScrubSquad
     constructor()
     {
         this._scrubs = [];
+        this._leader;
         this.length = 0;
         this.addScrub = this.addScrub.bind(this);
         this.getScrubs = this.getScrubs.bind(this);
@@ -16,9 +17,24 @@ class ScrubSquad
         this.length += 1;
     }
 
+    setLeader(scrubBubble)
+    {
+        var oldLeader = this._leader;
+        this._leader = scrubBubble;
+        return oldLeader;
+    }
+
+    getLeader(scrubBubble)
+    {
+        this._scrubs.push(scrubBubble);
+        this.length += 1;
+    }
+
     getScrubs()
     {
-        return this._scrubs;
+        var tempScrubs = this._scrubs;
+        if(this._leader) { tempScrubs.push(this._leader); }
+        return tempScrubs;
     }
 
     getScrub(index)
