@@ -27,17 +27,7 @@ exports.maybeDischargeScrubBubble = function()
         botMessageDescription += scrub.getRank() + ' Scrubbing Bubbles has arrived for duty!\n';
     });
 
-    c.BOT.sendMessage({
-        to: c.BOT_SPAM_CHANNEL_ID,
-        embed:  {
-            color: 0xffff00,
-            title: "Ronin Scrubs",
-            description: botMessageDescription,
-            image: {
-                url: c.BUBBLE_IMAGES[scrubs.length-1]
-            }
-        } 
-    });
+    util.sendEmbedMessage('Ronin Scrubs', botMessageDescription, c.BUBBLE_IMAGES[scrubs.length-1]);
 }
 
 exports.enlist = function(userID) 
@@ -46,10 +36,8 @@ exports.enlist = function(userID)
     if (scrubs.length > 0) 
     {
         addToArmy(userID, scrubs);
-        c.BOT.sendMessage({
-            to: c.BOT_SPAM_CHANNEL_ID,
-            message: '<@!' + userID + '>  ' + 'Your Scrubbing Bubbles army has grown by ' + scrubs.length + '! You now have an army of ' + ledger[userID].army.length + '.' 
-        });	
+        var message = '<@!' + userID + '>  ' + 'Your Scrubbing Bubbles army has grown by ' + scrubs.length + '! You now have an army of ' + ledger[userID].army.length + '.';
+        util.sendEmbedMessage(null, message);
         scrubs = [];
     } 
 }
@@ -68,11 +56,8 @@ exports.createSquad = function(userID)
     initUser(userID);
 
     ledger[userID].squads.push(new ScrubSquad());
-
-    c.BOT.sendMessage({
-        to: c.BOT_SPAM_CHANNEL_ID,
-        message: '<@!' + userID + '>  ' + 'You have just created squad ' + (ledger[userID].squads.length-1) + '! Make sure to assign a leader and add Scrubbing Bubbles to it!' 
-    });	
+    var message = '<@!' + userID + '>  ' + 'You have just created squad ' + (ledger[userID].squads.length-1) + '! Make sure to assign a leader and add Scrubbing Bubbles to it!';
+    util.sendEmbedMessage(null, message);
 }
 
 exports.deleteSquad = function(userID, args)
@@ -81,10 +66,7 @@ exports.deleteSquad = function(userID, args)
     var squadNumber = args[1];
     if(squadNumber == undefined)
     {
-        c.BOT.sendMessage({
-            to: c.BOT_SPAM_CHANNEL_ID,
-            message: '<@!' + userID + '>  Enter a squad number!' 
-        });	
+        util.sendEmbedMessage(null, '<@!' + userID + '>  Enter a squad number!');
     }
     if(squadCheck(userID, squadNumber)) { return; }
     
@@ -92,10 +74,8 @@ exports.deleteSquad = function(userID, args)
     ledger[userID].army.push.apply(ledger[userID].army, scrubs);
     ledger[userID].squads.splice(squadNumber, 1);
 
-    c.BOT.sendMessage({
-        to: c.BOT_SPAM_CHANNEL_ID,
-        message: '<@!' + userID + '>  ' + 'Squad ' + squadNumber + ' has been removed and scrubs have been added to your unsquaded pool!' 
-    });	
+    var message = '<@!' + userID + '>  ' + 'Squad ' + squadNumber + ' has been removed and scrubs have been added to your unsquaded pool!';
+    util.sendEmbedMessage(null, message);
 }
 
 
@@ -107,29 +87,25 @@ exports.addToSquad = function(userID, args)
     var scrubNumber = args[2];
     if(squadNumber == undefined || scrubNumber == undefined)
     {
-        c.BOT.sendMessage({
-            to: c.BOT_SPAM_CHANNEL_ID,
-            message: '<@!' + userID + '>  Enter both a squad number and a scrub number!' 
-        });	
+        var message = '<@!' + userID + '>  Enter both a squad number and a scrub number!';
+        util.sendEmbedMessage(null, message);
     }
     if(scrubCheck(userID, scrubNumber)) { return; }
     if(squadCheck(userID, squadNumber)) { return; }
+
     ledger[userID].squads[squadNumber].addScrub(ledger[userID].army[scrubNumber]);
     ledger[userID].army.splice(scrubNumber, 1);
-    c.BOT.sendMessage({
-        to: c.BOT_SPAM_CHANNEL_ID,
-        message: '<@!' + userID + '>  ' + 'Added a scrub to squad ' + squadNumber + '!' 
-    });	
+
+    var message = '<@!' + userID + '>  ' + 'Added a scrub to squad ' + squadNumber + '!';
+    util.sendEmbedMessage(null, message);
 }
 
 exports.getSquads = function(userID)
 {
     initUser(userID);
 
-    c.BOT.sendMessage({
-        to: c.BOT_SPAM_CHANNEL_ID,
-        message: '<@!' + userID + '>  Squad count: ' + ledger[userID].squads.length + '!' 
-    });	
+    var message = '<@!' + userID + '>  Squad count: ' + ledger[userID].squads.length + '!';
+    util.sendEmbedMessage(null, message);
 
     var botMessageDescription = '<@!' + userID + '>\n';
     for(i = 0; i < ledger[userID].squads.length; i++)
@@ -140,14 +116,8 @@ exports.getSquads = function(userID)
         {
             botMessageDescription += j + '.\t' + squad.getScrub(j).getRank() + ' Scrubbing Bubbles\n';
         }
-        c.BOT.sendMessage({
-            to: c.BOT_SPAM_CHANNEL_ID,
-            embed:  {
-                color: 0xffff00,
-                title: 'Squad ' + i,
-                description: botMessageDescription,
-            } 
-        });
+
+        util.sendEmbedMessage('Squad ' + i, botMessageDescription);
     }
 }
 
@@ -163,14 +133,7 @@ exports.getSquad = function(userID, args)
         botMessageDescription += i + '. ' + ledger[userID].squads[squadNumber].getScrub(i).getRank() + ' Scrubbing Bubbles\n';
     }
 
-    c.BOT.sendMessage({
-        to: c.BOT_SPAM_CHANNEL_ID,
-        embed:  {
-            color: 0xffff00,
-            title: 'Squad ' + squadNumber + '\'s scrubs:',
-            description: botMessageDescription,
-        } 
-    });
+    util.sendEmbedMessage('Squad ' + squadNumber + '\'s scrubs:', botMessageDescription);
 }
 
 exports.getUnsquaded = function(userID)
@@ -183,14 +146,7 @@ exports.getUnsquaded = function(userID)
         botMessageDescription += i + '.\t'+ledger[userID].army[i].getRank() + ' Scrubbing Bubbles\n';
     }
 
-    c.BOT.sendMessage({
-        to: c.BOT_SPAM_CHANNEL_ID,
-        embed:  {
-            color: 0xffff00,
-            title: 'Unsquaded Scrubs',
-            description: botMessageDescription,
-        } 
-    });
+    util.sendEmbedMessage('Unsquaded Scrubs', botMessageDescription);
 }
 
 function initUser(userID)
@@ -205,10 +161,7 @@ function squadCheck(userID, squadNumber)
 {
     if(squadNumber >= ledger[userID].squads.length)
     {
-        c.BOT.sendMessage({
-            to: c.BOT_SPAM_CHANNEL_ID,
-            message: '<@!' + userID + '>  That squad is out of index!' 
-        });	 
+        util.sendEmbedMessage(null, '<@!' + userID + '>  That squad is out of index!');
         return true;
     }
     return false;
@@ -218,10 +171,7 @@ function scrubCheck(userID, scrubNumber)
 {
     if(scrubNumber >= ledger[userID].army.length)
     {
-        c.BOT.sendMessage({
-            to: c.BOT_SPAM_CHANNEL_ID,
-            message: '<@!' + userID + '>  That scrub is out of index!' 
-        });	 
+        util.sendEmbedMessage(null, '<@!' + userID + '>  That scrub is out of index!');
         return true;
     }
     return false;

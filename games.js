@@ -178,7 +178,7 @@ function outputCumulativeTimePlayed(timePlayedData) {
 	}
 	fields.sort(util.compareFieldValues);
 	util.sendEmbedFieldsMessage('Cumulative Hours Played', fields);
-	c.LOG.info('<INFO> ' + util.getTimestamp() + '  Cumulative Hours Played All Games: ' + inspect(fields));
+	console.log('<INFO> ' + util.getTimestamp() + '  Cumulative Hours Played All Games: ' + inspect(fields));
 }
 
 /**
@@ -191,10 +191,10 @@ exports.maybeOutputTimePlayed = function(args) {
 	var target = nameAndTargetData.target;
 	var game = nameAndTargetData.game;
 
-	c.LOG.info('<INFO> ' + util.getTimestamp() + '  Time Called - game: ' + game + ' target: ' + target);		
+	console.log('<INFO> ' + util.getTimestamp() + '  Time Called - game: ' + game + ' target: ' + target);		
 	if (target !== '' && !isOptedIn(target)) { 
 		util.sendEmbedMessage(null,'I do not track that scrub\'s playtime.');
-		c.LOG.info('<INFO> ' + util.getTimestamp() + '  ' + target + ' is not opted in.');				
+		console.log('<INFO> ' + util.getTimestamp() + '  ' + target + ' is not opted in.');				
 		return; 
 	}
 	
@@ -208,7 +208,7 @@ exports.maybeOutputTimePlayed = function(args) {
 		var fields = [];
 		fields.push(util.buildField(game,timePlayedData.total.toFixed(1)));
 		util.sendEmbedFieldsMessage('Hours Played', fields);
-		c.LOG.info('<INFO> ' + util.getTimestamp() + '  Hours Played: ' + inspect(fields));
+		console.log('<INFO> ' + util.getTimestamp() + '  Hours Played: ' + inspect(fields));
     }
 }
 
@@ -309,7 +309,7 @@ function getUpdatedGameToTime(gameToTime, userName) {
 	
 	if (currentlyPlaying) {
 		var hoursPlayed = getTimePlayed(currentlyPlaying);
-		c.LOG.info('<INFO> ' + util.getTimestamp() + '  Presence Update - ' + userName + ' finished a ' + hoursPlayed.toFixed(4) + 'hr session of ' + currentlyPlaying.name);											
+		console.log('<INFO> ' + util.getTimestamp() + '  Presence Update - ' + userName + ' finished a ' + hoursPlayed.toFixed(4) + 'hr session of ' + currentlyPlaying.name);											
 		gameToTime[currentlyPlaying.name] += hoursPlayed;
 		gameToTime['playing'] = undefined;
 	}
@@ -329,7 +329,7 @@ function getUpdatedGameToTime(gameToTime, userName) {
 exports.updateTimesheet = function(user, userID, oldGame, newGame) {
 	//ignore presence updates for bots and online status changes
 	if (c.BOT_IDS.indexOf(userID) > -1 || oldGame === newGame) { return };	
-	c.LOG.info('<INFO> Presence Update - ' + user + ' id: ' + userID + ' old game: ' + oldGame + ' new game: ' + newGame)	
+	console.log('<INFO> Presence Update - ' + user + ' id: ' + userID + ' old game: ' + oldGame + ' new game: ' + newGame)	
 	
 	//get user's timesheet
 	var gameToTime = timeSheet[userID];
@@ -380,7 +380,7 @@ exports.optIn = function(user, userID) {
 	fields.push(util.buildField(user, 'I\'m watching you.'));
 	util.sendEmbedFieldsMessage('YOU ARE BEING WATCHED', fields);	
 	waitAndSendScrubDaddyFact(0,5);
-	c.LOG.info('<INFO> ' + util.getTimestamp() + '  ' + user + ' (' + userID + ') has opted into time#######');	
+	console.log('<INFO> ' + util.getTimestamp() + '  ' + user + ' (' + userID + ') has opted into time#######');	
 	var json = JSON.stringify(optedInUsers);	
 	fs.writeFile('optedIn.json', json, 'utf8', util.log);
 }

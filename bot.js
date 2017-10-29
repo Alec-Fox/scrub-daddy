@@ -24,9 +24,10 @@ var scrubIDtoNick = {};
  * Listen's for messages in Discord
  */
 client.on('message', message => {
+	console.log(message.content.substring(0, 1));
     //Scrub Daddy will listen for messages that will start with `!`
-    if (message.substring(0, 1) == '~') {
-		const args = message.substring(1).match(/\S+/g);
+    if (message.content.substring(0, 1) == '~') {
+		const args = message.content.substring(1).match(/\S+/g);
 		const cmd = args[0];
 		const channelID = message.channel.id;
 		const userID = message.member.id;
@@ -37,7 +38,7 @@ client.on('message', message => {
 			return;
 		}
 
-		c.LOG.info('<CMD> ' + util.getTimestamp() + '  ' + cmd + ' called');	
+		console.log('<CMD> ' + util.getTimestamp() + '  ' + cmd + ' called');	
         switch(cmd) {
 			case 'dropScrub':
 				dnb.maybeDischargeScrubBubble();
@@ -130,20 +131,20 @@ client.on('message', message => {
 				vote.conductVote(user, userID, channelID, args, c.VOTE_TYPE.CUSTOM);			
 				break;
 			case 'votekick':
-				c.LOG.info('<VOTE Kick> ' + util.getTimestamp() + '  ' + user + ': ' + message);
+				console.log('<VOTE Kick> ' + util.getTimestamp() + '  ' + user + ': ' + message);
 				vote.conductVote(user, userID, channelID, args, c.VOTE_TYPE.KICK, message.member.voiceChannel, message.guild.roles);
 				break;
 			case 'voteban':
-				c.LOG.info('<VOTE Ban> ' + util.getTimestamp() + '  ' + user + ': ' + message);			
+				console.log('<VOTE Ban> ' + util.getTimestamp() + '  ' + user + ': ' + message);			
 				vote.conductVote(user, userID, channelID, args, c.VOTE_TYPE.BAN, message.member.voiceChannel, message.guild.roles);
 				break;
 			//get custom vote totals or number of kick/ban votes for a user
 			case 'voteinfo':
 				if (!args[1]) {
-					c.LOG.info('<VOTE Info Custom> ' + util.getTimestamp() + '  ' + user + ': ' + message);								
+					console.log('<VOTE Info Custom> ' + util.getTimestamp() + '  ' + user + ': ' + message);								
 					vote.getCustomVoteTotals();
 				} else {
-					c.LOG.info('<VOTE Info User> ' + util.getTimestamp() + '  ' + user + ': ' + message);													
+					console.log('<VOTE Info User> ' + util.getTimestamp() + '  ' + user + ': ' + message);													
 					vote.getTotalVotesForTarget(user, message.member.voiceChannel, channelID, args);
 				}	
 				break;
@@ -167,7 +168,7 @@ client.on('message', message => {
  */
 client.on('presenceUpdate', (oldMember, newMember) => { 
 	games.updateTimesheet(newMember.displayName, newMember.id, get(oldMember, 'presence.activity.name'), get(newMember, 'presence.activity.name'));
-	gambling.maybeDischargeScrubBubble(botSpam);
+	//gambling.maybeDischargeScrubBubble(botSpam);
 });
 
 /**
@@ -182,7 +183,7 @@ client.on('disconnect', event => {
  * Logs the bot into Discord, stores id to nick map, and retrieves 3 crucial channels.
  */
 client.on('ready', () => {
-	c.LOG.info('<INFO> ' + util.getTimestamp() + '  Connected');
+	console.log('<INFO> ' + util.getTimestamp() + '  Connected');
 	
 	const members = client.guilds.find('id', c.SERVER_ID).members;
 	members.forEach((member) => {

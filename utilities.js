@@ -30,7 +30,7 @@ exports.submitIssue = function(user, issueMsg, message) {
 			}));	
 		})
 		.catch(console.error);
-		c.LOG.info('<INFO> ' + exports.getTimestamp() + '  ' + user + ' submitted issue: ' + issue);		
+		console.log('<INFO> ' + exports.getTimestamp() + '  ' + user + ' submitted issue: ' + issue);		
 	}
 }
 
@@ -93,12 +93,12 @@ exports.getTimestamp = function() {
 exports.log = function(error, response) {
 	if (!response) {
 		if (!error) {
-			c.LOG.info('<API INFO> ' + exports.getTimestamp() + '  Successful API Call');
+			console.log('<API INFO> ' + exports.getTimestamp() + '  Successful API Call');
 		} else {
-			c.LOG.info('<API RESPONSE> ' + exports.getTimestamp() + '  ERROR: ' + error);			
+			console.log('<API RESPONSE> ' + exports.getTimestamp() + '  ERROR: ' + error);			
 		}
 	} else {
-		c.LOG.info('<API RESPONSE> ' + exports.getTimestamp() + '  ' + inspect(response));
+		console.log('<API RESPONSE> ' + exports.getTimestamp() + '  ' + inspect(response));
 	}
 }
 
