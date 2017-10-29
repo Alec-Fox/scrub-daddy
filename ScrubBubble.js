@@ -3,7 +3,7 @@ class ScrubBubble
 {
     constructor()
     {
-        this._rank = 'Private';
+        this._rank = 'Pvt.';
         this. _experience = 0;
         this. _leaderExperience = 0;
         this.getRank = this.getRank.bind(this);
