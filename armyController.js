@@ -12,6 +12,54 @@ var dnb = require('./dnb.js');
 
 var ledger = require('./ledger.json');   //keeps track of how big of an army each member has as well as bet amounts
 
+function isInvalidArguments(args) 
+{
+    for (let i=0; i < args.length; i++)
+    {
+        if(isNaN(args[i]) || args[i] == undefined) { return true; }
+    }
+    return false;
+}
+
+function isInvalidArgumentsSendMessage(userID, ...args)
+{
+    if(isInvalidArguments(args))
+    {
+        util.sendEmbedMessage(null, '<@!' + userID + '>  Missing one or more fields!');
+        return true;
+    }
+    return false;
+}
+
+function squadCheck(userID, squadNumber)
+{
+    if(squadNumber >= ledger[userID].squads.length)
+    {
+        util.sendEmbedMessage(null, '<@!' + userID + '>  That squad is out of index!');
+        return true;
+    }
+    return false;
+}
+
+function scrubCheck(userID, scrubNumber)
+{
+    if(scrubNumber >= ledger[userID].army.length)
+    {
+        util.sendEmbedMessage(null, '<@!' + userID + '>  That scrub is out of index!');
+        return true;
+    }
+    return false;
+}
+
+function addToArmy(userID, scrubs) 
+{
+    util.initUser(userID);
+    for(let i = 0; i < scrubs.length; i++)
+    {
+        ledger[userID].army.push(scrubs[i]);
+    }
+}
+
 exports.enlist = function(userID) 
 {
     util.initUser(userID);
@@ -22,15 +70,6 @@ exports.enlist = function(userID)
         util.sendEmbedMessage(null, message);
         dnb.scrubs = [];
     } 
-}
-
-function addToArmy(userID, scrubs) 
-{
-    util.initUser(userID);
-    for(let i = 0; i < scrubs.length; i++)
-    {
-        ledger[userID].army.push(scrubs[i]);
-    }
 }
 
 exports.createSquad = function(userID)
@@ -147,44 +186,5 @@ exports.getUnsquaded = function(userID)
     }
 
     util.sendEmbedMessage('Unsquaded Scrubs', botMessageDescription);
-}
-
-function isInvalidArgumentsSendMessage(userID, ...args)
-{
-    if(isInvalidArguments(args))
-    {
-        util.sendEmbedMessage(null, '<@!' + userID + '>  Missing one or more fields!');
-        return true;
-    }
-    return false;
-}
-
-function isInvalidArguments(args) 
-{
-    for (let i=0; i < args.length; i++)
-    {
-        if(isNaN(args[i]) || args[i] == undefined) { return true; }
-    }
-    return false;
-}
-
-function squadCheck(userID, squadNumber)
-{
-    if(squadNumber >= ledger[userID].squads.length)
-    {
-        util.sendEmbedMessage(null, '<@!' + userID + '>  That squad is out of index!');
-        return true;
-    }
-    return false;
-}
-
-function scrubCheck(userID, scrubNumber)
-{
-    if(scrubNumber >= ledger[userID].army.length)
-    {
-        util.sendEmbedMessage(null, '<@!' + userID + '>  That scrub is out of index!');
-        return true;
-    }
-    return false;
 }
 //export default dnb;
