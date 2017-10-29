@@ -4,9 +4,6 @@
  *The game sounded cooler in my head
  */
 
-//import { ScrubBubble } from './ScrubBubble.js';
-//import ScrubSquad from './ScrubSquad.js';
-
 const util = require('./utilities.js');
 const ScrubBubble = require('./ScrubBubble');
 const ScrubSquad = require('./ScrubSquad');
@@ -56,6 +53,7 @@ exports.createSquad = function(userID)
     initUser(userID);
 
     ledger[userID].squads.push(new ScrubSquad());
+
     var message = '<@!' + userID + '>  ' + 'You have just created squad ' + (ledger[userID].squads.length-1) + '! Make sure to assign a leader and add Scrubbing Bubbles to it!';
     util.sendEmbedMessage(null, message);
 }
@@ -63,11 +61,9 @@ exports.createSquad = function(userID)
 exports.deleteSquad = function(userID, args)
 {
     initUser(userID);
-    var squadNumber = args[1];
-    if(squadNumber == undefined)
-    {
-        util.sendEmbedMessage(null, '<@!' + userID + '>  Enter a squad number!');
-    }
+    var squadNumber = Number(args[1]);
+    
+    if(isInvalidArgumentsSendMessage(userID, squadNumber)) { return; }
     if(squadCheck(userID, squadNumber)) { return; }
     
     scrubs = ledger[userID].squads[squadNumber].getScrubs();
@@ -78,18 +74,14 @@ exports.deleteSquad = function(userID, args)
     util.sendEmbedMessage(null, message);
 }
 
-
 //takes userID, number of squad to add scrubs and an array of scrubs to add
 exports.addToSquad = function(userID, args)
 {
     initUser(userID);
-    var squadNumber = args[1];
-    var scrubNumber = args[2];
-    if(squadNumber == undefined || scrubNumber == undefined)
-    {
-        var message = '<@!' + userID + '>  Enter both a squad number and a scrub number!';
-        util.sendEmbedMessage(null, message);
-    }
+    var squadNumber = Number(args[1]);
+    var scrubNumber = Number(args[2]);
+    if(isInvalidArgumentsSendMessage(userID, squadNumber, scrubNumber)) { return; }
+
     if(scrubCheck(userID, scrubNumber)) { return; }
     if(squadCheck(userID, squadNumber)) { return; }
 
@@ -124,7 +116,9 @@ exports.getSquads = function(userID)
 exports.getSquad = function(userID, args)
 {
     initUser(userID);
-    var squadNumber = args[1];
+    var squadNumber = Number(args[1]);
+
+    if(isInvalidArgumentsSendMessage(userID, squadNumber, scrubNumber)) { return; }
     if(squadCheck(userID, squadNumber)) { return; }
 
     var botMessageDescription = '<@!' + userID + '>\n';
@@ -155,6 +149,25 @@ function initUser(userID)
     {
         ledger[userID] = { armySize : 0, cleanBet : 0, raceBet : 0, army: [], squads: []};
     }
+}
+
+function isInvalidArgumentsSendMessage(userID, ...args)
+{
+    if(isInvalidArguments(args))
+    {
+        util.sendEmbedMessage(null, '<@!' + userID + '>  Missing one or more fields!');
+        return true;
+    }
+    return false;
+}
+
+function isInvalidArguments(...args) 
+{
+    for (let i=0; i < args.length; i++)
+    {
+        if(isNaN(args[i]) || args[i] == undefined) { return true; }
+    }
+    return false;
 }
 
 function squadCheck(userID, squadNumber)

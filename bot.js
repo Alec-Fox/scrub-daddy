@@ -24,7 +24,6 @@ var scrubIDtoNick = {};
  * Listen's for messages in Discord
  */
 client.on('message', message => {
-	console.log(message.content.substring(0, 1));
     //Scrub Daddy will listen for messages that will start with `!`
     if (message.content.substring(0, 1) == '~') {
 		const args = message.content.substring(1).match(/\S+/g);
