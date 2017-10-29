@@ -1,6 +1,38 @@
-const c = require('./const.js');
+var Discord = require('discord.js');
+var inspect = require('util-inspect');
+var get = require('lodash.get');
+
+var c = require('./const.js');
+var bot = require('./bot.js');
 const catFacts = require('./catfacts.json');
-const scrubData = require('../scrubData.json');
+
+/**
+ * For submitting issues with the bot.
+ * @param {String} user - the user's name
+ * @param {String[]} issueMsg - the issue message split by spaces
+ * @param {Object} message - the full message object
+ */
+exports.submitIssue = function(user, issueMsg, message) {
+	if (issueMsg[1]) {
+		var issue = '';
+		for (i=2; i < issueMsg.length; i++) {
+			issue += issueMsg[i] + ' ';
+		}	
+		
+		message.guild.createChannel(issueMsg[1], "text")
+		.then((channel) => {			
+			//Moves channel to the Feedback category
+			channel.setParent(c.FEEDBACK_CATEGORY_ID);
+			channel.send(new Discord.MessageEmbed({
+				color: 0xffff00,
+				title: 'Issue Submitted By ' + user,
+				description: issue,
+			}));	
+		})
+		.catch(console.error);
+		c.LOG.info('<INFO> ' + exports.getTimestamp() + '  ' + user + ' submitted issue: ' + issue);		
+	}
+}
 
 /**
  * initializes the logger.
@@ -59,14 +91,14 @@ exports.getTimestamp = function() {
  * @param {Object} response - response returned from API request
  */
 exports.log = function(error, response) {
-	if (undefined === response) {
-		if (null === error || undefined === error) {
+	if (!response) {
+		if (!error) {
 			c.LOG.info('<API INFO> ' + exports.getTimestamp() + '  Successful API Call');
 		} else {
 			c.LOG.info('<API RESPONSE> ' + exports.getTimestamp() + '  ERROR: ' + error);			
 		}
 	} else {
-		c.LOG.info('<API RESPONSE> ' + exports.getTimestamp() + '  ' + response);
+		c.LOG.info('<API RESPONSE> ' + exports.getTimestamp() + '  ' + inspect(response));
 	}
 }
 
@@ -104,33 +136,49 @@ exports.compareFieldValues = function(a,b) {
 /**
  * Output vote count to bot-spam channel
  */
-exports.sendEmbedMessage = function(title, fields) {
-	c.BOT.sendMessage({
-		to: c.BOT_SPAM_CHANNEL_ID,
-		embed:  {
-			color: 0xffff00,
-			title: title,
-			fields: fields
-		} 
-	});	
+exports.sendEmbedFieldsMessage = function(title, fields) {
+	if (fields.length === 1 && fields[0].name === '') {
+		return;
+	}
+
+	bot.getBotSpam().send(new Discord.MessageEmbed({
+		color: 0xffff00,
+		title: title,
+		fields: fields
+	}));	
 }
 
+/**
+ * Sends an embed message to bot-spam with an optional title, description, and image.
+ */
+exports.sendEmbedMessage = function(title, description, image) {
+	//these are all optional parameters
+	title = title || '';
+	description = description || '';
+	image = image || '';
+
+	bot.getBotSpam().send(new Discord.MessageEmbed({
+		color: 0xffff00,
+		title: title,
+		description: description,
+		image: {
+			url: image
+		} 
+	}));	
+}
+
+/**
+ * Outputs a cat fact.
+ */
 exports.catfacts = function() {
 	const factIdx = exports.getRand(0,catFacts.length);
-	c.BOT.sendMessage({
-		to: c.BOT_SPAM_CHANNEL_ID,
-		embed:  {
-			color: 0xffff00,
-			title: 'Did you know?',
-			description: catFacts[factIdx] + '\n 🐈 Meeeeee-WOW!'
-		} 
-	});	
+	const msg = catFacts[factIdx] + '\n 🐈 Meeeeee-WOW!';
+	exports.sendEmbedMessage('Did you know?', msg);
 }
 
+/**
+ * Gets a map of scrub's ids to nicknames.
+ */
 exports.getScrubIDToNick = function() {
-	scrubIDtoNick = {};
-	scrubData.forEach(function(member)  {
-		scrubIDtoNick[member.id] = member.nick;
-	});
-	return scrubIDtoNick;
+	return bot.getScrubIDToNick();
 }
