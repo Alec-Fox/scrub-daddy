@@ -6,6 +6,7 @@
   "author": "Kent",
   "dependencies": {
     "discord.io": "^2.5.3",
+    "discord.js": "git+https://github.com/hydrabolt/discord.js.git",
     "winston": "^2.3.1"
   }
 }
