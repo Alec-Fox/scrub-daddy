@@ -5,6 +5,7 @@ var get = require('lodash.get');
 var c = require('./const.js');
 var bot = require('./bot.js');
 const catFacts = require('./catfacts.json');
+var ledger = require('./ledger.json');   //keeps track of how big of an army each member has as well as bet amounts
 
 /**
  * For submitting issues with the bot.
@@ -181,4 +182,15 @@ exports.catfacts = function() {
  */
 exports.getScrubIDToNick = function() {
 	return bot.getScrubIDToNick();
+}
+
+/*
+ * Initializes a user that was not defined in the ledger.
+ */
+exports.initUser = function(userID)
+{
+    if (ledger[userID] === undefined) 
+    {
+        ledger[userID] = { armySize : 0, cleanBet : 0, raceBet : 0, army: [], squads: []};
+    }
 }
