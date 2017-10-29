@@ -5,6 +5,7 @@ var fs = require('fs');
 
 var c = require('./const.js');
 var dnb = require('./dnb.js');
+var army = require('./armyController.js');
 var util = require('./utilities.js');
 var gambling = require('./gambling.js');
 var games = require('./games.js');
@@ -43,28 +44,28 @@ client.on('message', message => {
 				dnb.maybeDischargeScrubBubble();
 				break;
 			case 'createSquad':
-				dnb.createSquad(userID);
+				army.createSquad(userID);
 				break;
 			case 'addToSquad':
-				dnb.addToSquad(userID, args);
+				army.addToSquad(userID, args);
 				break;
 			case 'getSquads':
-				dnb.getSquads(userID);
+				army.getSquads(userID);
 				break;
 			case 'getSquad':
-				dnb.getSquad(userID, args);
+				army.getSquad(userID, args);
 				break;
 			case 'getUnsquaded':
-				dnb.getUnsquaded(userID);
+				army.getUnsquaded(userID);
 				break;
 			case 'deleteSquad':
-				dnb.deleteSquad(userID, args);
+				army.deleteSquad(userID, args);
 				break;
 			case 'removeFromSquad':
-				dnb.removeFromSquad(userID, args);
+				army.removeFromSquad(userID, args);
 				break;
 			case 'dismissScrub':
-				dnb.dismissScrub(userID, args);
+				army.dismissScrub(userID, args);
 				break;
 			case 'ranks':
 				gambling.armyRanks();
@@ -108,7 +109,7 @@ client.on('message', message => {
 				gambling.dischargeScrubBubble(userID);
 				break;
 			case 'enlist':
-				dnb.enlist(userID);
+				army.enlist(userID);
 				break;
 			case 'p':
 				games.askToPlayPUBG();
