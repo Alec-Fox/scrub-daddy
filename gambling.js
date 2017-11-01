@@ -155,6 +155,39 @@ function maybeGetPlural(count) {
 }
 
 /**
+ * Adds to to the user's gambling stats.
+ * 
+ * @param {String} winsLosses - 'Wins' or 'Losses'
+ * @param {String} wonLost - 'Won' or 'Lost'
+ * @param {number} amount - amount the user won or lost
+ * @param {String} user - the user to add stats to
+ */
+function addToGamblingStats(winsLosses, wonLost, amount, user) {
+    const stat = 'highest' + wonLost;
+    const currentStreak = 'currentStreak' + winsLosses;
+    const highestStreak = 'highestStreak' + winsLosses;
+    var now = 'Wins'
+    var opposite = 'Losses'
+    if(winsLosses === 'Losses'){
+        var now = 'Losses';
+        var opposite = 'Wins';
+    }
+    const oppositeStreak = 'currentStreak' + opposite;
+    if (amount > ledger[user][stat]) {
+        ledger[user][stat] = amount;
+    }
+
+    ledger[user]['scrubs'+wonLost] += amount;
+    ledger[user]['total'+winsLosses]++;
+    ledger[user][currentStreak]++;
+    ledger[user][oppositeStreak] = 0;
+    if (ledger[user][currentStreak] > ledger[user][highestStreak]){
+        ledger[user][highestStreak] = ledger[user][currentStreak];
+    }
+}
+
+
+/**
  * Handles !clean command. Takes the bet from the user and
  * keeps it if they lose. If they win, twice the bet is given to the user.
  * 
@@ -180,24 +213,14 @@ function betClean(userID, bet, type, side) {
 
         if (util.getRand(0,2) === getTypeNum(side)) {
             const payout = bet*2;
-            ledger[userID].scrubsWon += payout;
-            ledger[userID].totalWins++;
             img = c.CLEAN_WIN_IMG;
             msg = 'Congrats, your auxiliary army gained ' + payout + ' Scrubbing Bubbles after cleaning the bathroom and conquering the land!';
             addToArmy(userID, payout);
-            if (payout > ledger[userID].highestWon) {
-                ledger[userID].highestWon = payout;
-            }
+            addToGamblingStats('Wins', 'Won', payout, userID);
         } else {
             img = c.CLEAN_LOSE_IMG;
             msg = 'Sorry bud, you lost ' + bet + ' Scrubbing Bubble' + maybeGetPlural(bet) + ' in the battle.';
-            ledger[userID].scrubsLost += bet;
-            ledger[userID].totalLosses++;
-
-            if (bet > ledger[userID].highestLost) {
-                ledger[userID].highestLost = bet;
-
-            }
+            addToGamblingStats('Losses', 'Lost', bet, userID);
         }
         util.sendEmbedMessage(null, '<@!' + userID + '>  ' + msg, img);
         resetLedgerAfterBet(userID, bet, type);
@@ -219,9 +242,9 @@ exports.maybeBetClean = function(userID, args) {
 }
 
 /**
- * Outputs the user's army size.
+ * Outputs the user's army size or their gambling stats.
  */
-exports.army = function(userID, args) {
+function outputUserGamblingData(userID, args) {
     var msg = ' your';
     if (args[1]) {
         if (args[1].match(/\d/g) !== null) {
@@ -231,35 +254,43 @@ exports.army = function(userID, args) {
     }
     const wallet = ledger[userID];
     if (wallet) {
-        const description = '<@!' + userID + '>'+ msg +  ' army is ' + wallet.armySize +  ' Scrubbing Bubble' + maybeGetPlural(wallet.armySize) + ' strong!';
+        var description = '';
+        if (args[0] === 'army') {
+            description = '<@!' + userID + '>'+ msg +  ' army is ' + wallet.armySize +  ' Scrubbing Bubble' + maybeGetPlural(wallet.armySize) + ' strong!';
+        } else {
+            description = '<@!' + userID + '>' + msg + ' Stats (starting from 10/31/17): ' + 
+                          '\nCurrent Army Size: ' + wallet.armySize + ' Scrubs' +
+                          '\nRecord Army Size: ' + wallet.recordArmy + ' Scrubs' +
+                          '\nLifetime Scrubs Won: ' + wallet.scrubsWon + ' Scrubs' +
+                          '\nLifetime Scrubs Lost: ' + wallet.scrubsLost + ' Scrubs' +
+                          '\nBiggest Bet Won: ' + wallet.highestWon + ' Scrubs' +
+                          '\nBiggest Bet Lost: ' + wallet.highestLost + ' Scrubs' +
+                          '\nTotal Bets Won: ' + wallet.totalWins + ' Wins' +
+                          '\nTotal Bets Lost: ' + wallet.totalLosses + ' Losses' +
+                          '\nTotal Scrubs Discharged: ' + wallet.totalDischarged + ' Scrubs' +
+                          '\nTotal Scrubs Enlisted: ' + wallet.totalEnlisted + ' Scrubs'; +
+                          '\nCurrent Win Streak: ' + wallet.currentStreakWins + ' Wins' +
+                          '\nCurrent Lose Streak: ' + wallet.currentStreakLosses + ' Losses' +
+                          '\nHighest Win Streak: ' + wallet.highestStreakWins + ' Wins' +
+                          '\nHighest Lose Streak: ' + wallet.highestStreakLosses + ' Losses';
+        }
         util.sendEmbedMessage(null, description);
     }
 }
 
+
+/**
+ * Outputs the user's army size.
+ */
+exports.army = function(userID, args) {
+    outputUserGamblingData(userID, args);
+}
+
+/**
+ * Outputs the user's gambling stats.
+ */
 exports.stats = function (userID, args) {
-    var msg = ' your';
-    if (args[1]) {
-        if (args[1].match(/\d/g) !== null) {
-            userID = args[1].match(/\d/g).join('')
-            msg = '\'s';
-        }
-    }
-    const wallet = ledger[userID];
-    if (wallet) {
-        const description = '<@!' + userID + '>' + msg + ' Stats (starting from 10/31/17): ' + 
-            '\nCurrent Army Size: ' + wallet.armySize + 'Scrubs' +
-            '\nRecord Army Size: ' + wallet.recordArmy + 'Scrubs' +
-            '\nLifetime Scrubs Won: ' + wallet.scrubsWons + 'Scrubs' +
-            '\nLifetime Scrubs Lost: ' + wallet.scrubsLost + 'Scrubs' +
-            '\nBiggest Bet Won: ' + wallet.highestWon + 'Scrubs' +
-            '\nBiggest Bet Lost: ' + wallet.highestLost + 'Scrubs' +
-            '\nTotal Bets Won: ' + wallet.totalWins + 'Wins' +
-            '\nTotal Bets Lost: ' + wallet.totalLosses + 'Losses' +
-            '\nTotal Scrubs Discharged: ' + wallet.totalDischarged + 'Scrubs' +
-            '\nTotal Scrubs Enlisted: ' + wallet.totalEnlistesd + 'Scrubs'; 
-           
-            util.sendEmbedMessage(null, description);
-    }
+    outputUserGamblingData(userID, args);    
 }
 
 /**
